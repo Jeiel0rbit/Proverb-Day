@@ -1,4 +1,5 @@
 ![](https://i.imgur.com/80WBR8i.png)
+> https://proverb-day.pages.dev/
 
 Pesquisei sites e aplicativos, mas não há outro que se tem uso de leitura diária para o livro considerado sagrado, em específico: Provérbios de Salomão. 
 
@@ -63,6 +64,10 @@ Para deixar um estímulo à leitura, foi adcionado um `dialog`. Somente quando o
 ```
 
 PWA simples foi adicionado para facilitar o acesso imediato. Códifo fonte se encontra no Github: https://github.com/Jetrom17/Proverb-Day
+
+![](https://i.imgur.com/ngJmIcC.jpeg)
+
+#
 
 *Caso queira **mais de 10 versões** em português. Você pode acessar nesse link, escrito pelo colega @rodrigobsm.*
 
