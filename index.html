@@ -15,70 +15,107 @@
     <link rel="icon" href="bible-.png" type="image/png">
     <link rel="apple-touch-icon" href="bible-.png">
     <link rel="manifest" href="manifest.json">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@material/web@1.0.0/dist/material.min.css">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@material/web@1.0.0/dist/material.min.js"></script>
     <title>Provérbios do Dia</title>
     <style>
-        @media (min-width: 1024px) {
+        :root {
+            --md-sys-color-primary: #006495;
+            --md-sys-color-surface: #fafbff;
+            --md-sys-color-surface-container: #edf0f8;
+        }
+        
+        body {
+            margin: 0;
+            padding: 16px;
+            background-color: var(--md-sys-color-surface);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        h1 {
+            color: var(--md-sys-color-primary);
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 24px;
+        }
+
+        .chapter-card {
+            background-color: var(--md-sys-color-surface-container);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--md-sys-elevation-level1);
+        }
+
+        #verses p {
+            margin: 16px 0;
+            line-height: 1.6;
+            font-size: 1.1rem;
+            padding: 12px;
+            border-radius: 8px;
+            background-color: var(--md-sys-color-surface-container);
+        }
+
+        md-dialog {
+            --md-dialog-container-color: var(--md-sys-color-surface);
+            border-radius: 28px;
+            padding: 24px;
+        }
+
+        @media (min-width: 768px) {
             body {
-                padding: 4rem;
+                padding: 24px;
             }
 
             h1 {
                 font-size: 3rem;
             }
 
+            #verses p {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            body {
+                padding: 32px;
+            }
+
             .container {
-                max-width: 800px;
-                margin: 0 auto;
-            }
-
-            .bg-gray-200 {
-                padding: 3rem;
+                padding: 32px;
             }
 
             #verses p {
-                font-size: 1.25rem;
+                font-size: 1.3rem;
             }
-        }
-
-        @media (min-width: 1600px) {
-            h1 {
-                font-size: 5rem;
-            }
-
-            .bg-gray-200 {
-                padding: 4rem;
-            }
-
-            #verses p {
-                font-size: 2rem;
-            }
-        }
-
-        dialog {
-            border: none;
-            padding: 2rem;
-            background-color: #f9f9f9;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
         }
     </style>
 </head>
-<body class="bg-gray-100 p-4 lg:p-8">
-    <div class="container mx-auto">
-        <h1 class="text-4xl lg:text-6xl font-bold mb-6 text-center">Provérbios do Dia</h1>
-        <div class="bg-gray-200 p-4 lg:p-6 rounded-lg mb-6">
-            <p class="text-xl lg:text-2xl font-bold text-center">Capítulo de Hoje:</p>
-            <p id="chapter-display" class="text-lg lg:text-xl text-center"></p>
+<body>
+    <div class="container">
+        <h1>Provérbios do Dia</h1>
+        <div class="chapter-card">
+            <h2 style="text-align: center; margin: 0;">Capítulo de Hoje:</h2>
+            <p id="chapter-display" style="text-align: center; font-size: 1.5rem; margin: 8px 0 0 0;"></p>
         </div>
-        <div id="verses" class="space-y-4 text-justify"></div>
+        <div id="verses"></div>
     </div>
 
-    <dialog id="end-dialog">
-        <p class="text-xl lg:text-2xl">Espírito edificado, volte amanhã fortificado!</p>
-        <button class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg" onclick="document.getElementById('end-dialog').close();">Fechar</button>
-    </dialog>
+    <md-dialog id="end-dialog">
+        <div slot="content" style="text-align: center;">
+            <p style="font-size: 1.25rem; margin-bottom: 24px;">Espírito edificado, volte amanhã fortificado!</p>
+            <md-filled-button onclick="document.getElementById('end-dialog').close();">
+                Fechar
+            </md-filled-button>
+        </div>
+    </md-dialog>
 
     <script>
         const date = new Date();
@@ -109,7 +146,7 @@
             const observer = new IntersectionObserver(entries => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        document.getElementById('end-dialog').showModal();
+                        document.getElementById('end-dialog').show();
                     }
                 });
             });
