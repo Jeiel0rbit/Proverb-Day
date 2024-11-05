@@ -4,11 +4,11 @@
     <meta name="google-site-verification" content="9EFkJwAO-K0-P1RQBq8a-cWkt6oAgjmR_Jkf4_2yzLE" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="30/31 dias para entender sabedoria divina que não se encontra na terra, mas é concedido pelo Espiríto de YHWH.">
+    <meta name="description" content="30/31 dias para entender sabedoria divina que não se encontra na terra, mas é concedido pelo Espírito de YHWH.">
     <meta name="keywords" content="Provérbios, Provérbios do dia, Salomão">
     <meta name="author" content="Jeiel Miranda">
     <meta property="og:title" content="Provérbios do dia">
-    <meta property="og:description" content="30/31 dias para entender sabedoria divina que não se encontra na terra, mas é concedido pelo Espiríto de YHWH.">
+    <meta property="og:description" content="30/31 dias para entender sabedoria divina que não se encontra na terra, mas é concedido pelo Espírito de YHWH.">
     <meta property="og:image" content="https://i.imgur.com/80WBR8i.png">
     <meta property="og:url" content="https://proverb-day.pages.dev">
     <meta property="og:site_name" content="Provérbios do dia">
@@ -109,12 +109,7 @@
     </div>
 
     <md-dialog id="end-dialog">
-        <div slot="content" style="text-align: center;">
-            <p style="font-size: 1.25rem; margin-bottom: 24px;">Espírito edificado, volte amanhã fortificado!</p>
-            <md-filled-button onclick="document.getElementById('end-dialog').close();">
-                Fechar
-            </md-filled-button>
-        </div>
+        <h1 slot="header"> Espírito edificado, volte amanhã fortificado!</h1>
     </md-dialog>
 
     <script>
@@ -146,7 +141,7 @@
             const observer = new IntersectionObserver(entries => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        document.getElementById('end-dialog').show();
+                        document.getElementById('end-dialog').showModal();
                     }
                 });
             });
