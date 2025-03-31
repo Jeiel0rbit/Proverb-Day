@@ -15,21 +15,24 @@
     <link rel="icon" href="bible-.png" type="image/png">
     <link rel="apple-touch-icon" href="bible-.png">
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@material/web@1.0.0/dist/material.min.css">
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@material/web@1.0.0/dist/material.min.js"></script>
     <title>Provérbios do Dia</title>
     <style>
         :root {
             --md-sys-color-primary: #006495;
             --md-sys-color-surface: #fafbff;
             --md-sys-color-surface-container: #edf0f8;
+            --gold-primary: #D4AF37;      /* Dourado principal */
+            --gold-light: #FFD700;        /* Dourado mais claro */
+            --gold-dark: #B8860B;         /* Dourado mais escuro */
+            --gold-pale: #EEE8AA;         /* Dourado pálido */
+            --gold-deep: #8B7355;         /* Dourado profundo */
+            --gold-bg: #FFFAF0;           /* Fundo levemente dourado */
         }
         
         body {
             margin: 0;
             padding: 16px;
-            background-color: var(--md-sys-color-surface);
+            background-color: var(--gold-bg);
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
 
@@ -40,18 +43,20 @@
         }
 
         h1 {
-            color: var(--md-sys-color-primary);
+            color: var(--gold-dark);
             text-align: center;
             font-size: 2rem;
             margin-bottom: 24px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
         .chapter-card {
-            background-color: var(--md-sys-color-surface-container);
+            background-color: var(--gold-pale);
             border-radius: 16px;
             padding: 24px;
             margin-bottom: 24px;
-            box-shadow: var(--md-sys-elevation-level1);
+            box-shadow: 0 4px 8px rgba(184, 134, 11, 0.2);
+            border: 1px solid var(--gold-primary);
         }
 
         #verses p {
@@ -60,13 +65,27 @@
             font-size: 1.1rem;
             padding: 12px;
             border-radius: 8px;
-            background-color: var(--md-sys-color-surface-container);
+            background-color: white;
+            border-left: 4px solid var(--gold-primary);
+            color: var(--gold-deep);
+            transition: transform 0.2s ease;
+        }
+
+        #verses p:hover {
+            transform: translateX(5px);
+            background-color: var(--gold-pale);
         }
 
         md-dialog {
-            --md-dialog-container-color: var(--md-sys-color-surface);
+            --md-dialog-container-color: var(--gold-bg);
             border-radius: 28px;
             padding: 24px;
+            border: 2px solid var(--gold-primary);
+        }
+
+        #chapter-display {
+            color: var(--gold-dark);
+            font-weight: bold;
         }
 
         @media (min-width: 768px) {
@@ -76,6 +95,10 @@
 
             h1 {
                 font-size: 3rem;
+                background: linear-gradient(45deg, var(--gold-dark), var(--gold-primary));
+                background-clip: text;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
             }
 
             #verses p {
@@ -98,6 +121,20 @@
         }
     </style>
 </head>
+<script>
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then((registration) => {
+                console.log('Service Worker registrado com sucesso:', registration);
+
+                // Removido o trecho que solicita permissão automaticamente
+                // Isso garante que a permissão só será solicitada ao clicar no botão
+            })
+            .catch((error) => {
+                console.error('Falha ao registrar o Service Worker:', error);
+            });
+    }
+</script>
 <body>
     <div class="container">
         <h1>Provérbios do Dia</h1>
@@ -108,45 +145,129 @@
         <div id="verses"></div>
     </div>
 
-    <md-dialog id="end-dialog">
-        <h1 slot="header"> Espírito edificado, volte amanhã fortificado!</h1>
+    <!-- Adicione este botão no corpo do HTML -->
+    <button id="enable-notifications" style="display: block; margin: 16px auto; padding: 12px 24px; font-size: 1rem; background-color: var(--gold-primary); color: white; border: none; border-radius: 8px; cursor: pointer;">
+        Ativar Notificações
+    </button>
+
+    <md-dialog id="end-dialog" style="display: flex; justify-content: center; align-items: center; height: 200px;">
+        <h1 id="dialog-message" style="font-size: 4rem; text-align: center;">Carregando...</h1>
     </md-dialog>
+    
+    <script>
+        setTimeout(function() {
+            document.getElementById('dialog-message').innerText = "Espírito edificado, volte amanhã fortificado!";
+        }, 3000);
+    </script>    
 
     <script>
-        const date = new Date();
-        date.setTime(date.getTime() + (3600000 * -3)); // Ajuste para UTC-3
-        const chapter = date.getDate();
-        document.getElementById('chapter-display').textContent = `Capítulo ${chapter}`;
+        async function loadVerses() {
+            try {
+                const response = await fetch('nvi.json');
+                const bibleData = await response.json();
+                console.log('Bible Data:', bibleData);
 
-        fetch(`https://blue-bread-4e1d.jeiel-lima-miranda.workers.dev?chapter=${chapter}`)
-            .then(response => response.json())
-            .then(data => {
+                const bookAbbrev = 'pv';
+                const book = bibleData.find(b => b.abbrev === bookAbbrev);
+
+                if (!book || !book.chapters || book.chapters.length === 0) {
+                    console.error('Chapters não encontrados ou mal formatados');
+                    return;
+                }
+
+                const date = new Date();
+                const chapterIndex = date.getDate() - 1;
+
+                if (!book.chapters[chapterIndex]) {
+                    console.error('Capítulo não encontrado');
+                    return;
+                }
+
+                document.getElementById('chapter-display').textContent = `Capítulo ${chapterIndex + 1}`;
                 const versesContainer = document.getElementById('verses');
-                data.verses.forEach((verse, index) => {
+                const verses = book.chapters[chapterIndex];
+
+                verses.forEach((verse, index) => {
                     const verseElement = document.createElement('p');
-                    verseElement.textContent = `${verse.number} - ${verse.text}`;
+                    verseElement.textContent = `${index + 1} - ${verse}`;
                     versesContainer.appendChild(verseElement);
 
-                    if (index === data.verses.length - 1) {
+                    if (index === verses.length - 1) {
                         verseElement.setAttribute('id', 'last-verse');
                     }
                 });
 
                 observeLastVerse();
-            })
-            .catch(error => console.error('Erro ao buscar versículos:', error));
+            } catch (error) {
+                console.error('Erro ao carregar versículos:', error);
+            }
+        }
 
         function observeLastVerse() {
             const lastVerse = document.getElementById('last-verse');
-            const observer = new IntersectionObserver(entries => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        document.getElementById('end-dialog').showModal();
+            if (lastVerse) {
+                console.log('Último versículo exibido:', lastVerse.textContent);
+            }
+        }
+
+        window.onload = loadVerses;
+    </script>
+
+    <script>
+        document.getElementById('enable-notifications').addEventListener('click', () => {
+            if ('serviceWorker' in navigator && 'PushManager' in window) {
+                // Solicitar permissão para notificações
+                Notification.requestPermission().then((permission) => {
+                    if (permission === 'granted') {
+                        console.log('Permissão para notificações concedida.');
+
+                        // Registrar o Service Worker
+                        navigator.serviceWorker.register('/service-worker.js')
+                            .then((registration) => {
+                                console.log('Service Worker registrado com sucesso:', registration);
+
+                                // Enviar notificação de confirmação
+                                registration.showNotification('Notificações Ativadas', {
+                                    body: 'Você receberá notificações diárias para ler o capítulo de hoje.',
+                                    icon: 'bible-.png',
+                                    badge: 'bible-.png'
+                                });
+
+                                // Agendar notificações diárias
+                                scheduleDailyNotification();
+                            })
+                            .catch((error) => {
+                                console.error('Falha ao registrar o Service Worker:', error);
+                            });
+                    } else {
+                        console.log('Permissão para notificações negada.');
                     }
                 });
-            });
+            } else {
+                console.error('Service Worker ou PushManager não suportados neste navegador.');
+            }
+        });
 
-            observer.observe(lastVerse);
+        function scheduleDailyNotification() {
+            if ('serviceWorker' in navigator && 'Notification' in window) {
+                navigator.serviceWorker.ready.then((registration) => {
+                    const title = 'Provérbios do Dia';
+                    const options = {
+                        body: 'Leia o capítulo de hoje e edifique seu espírito!',
+                        icon: 'bible-.png',
+                        badge: 'bible-.png'
+                    };
+
+                    // Agendar notificação para o próximo dia
+                    const now = new Date();
+                    const nextDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 8, 0, 0); // 8:00 AM
+                    const delay = nextDay - now;
+
+                    setTimeout(() => {
+                        registration.showNotification(title, options);
+                    }, delay);
+                });
+            }
         }
     </script>
 </body>

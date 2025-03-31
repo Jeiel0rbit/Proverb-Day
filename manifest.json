@@ -1,15 +1,21 @@
 {
-  "short_name": "PV Day",
-  "name": "Proverb Day",
-  "icons": [
-    {
-      "src": "bible-.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    }
-  ],
-  "start_url": "/",
+  "name": "Provérbios do Dia",
+  "short_name": "Provérbios",
+  "description": "Receba notificações diárias para ler um capítulo de Provérbios.",
+  "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff"
+  "background_color": "#FFFAF0",
+  "theme_color": "#D4AF37",
+  "icons": [
+      {
+          "src": "bible-.png",
+          "sizes": "192x192",
+          "type": "image/png"
+      },
+      {
+          "src": "bible-.png",
+          "sizes": "512x512",
+          "type": "image/png"
+      }
+  ]
 }
