@@ -122,17 +122,10 @@
     </style>
 </head>
 <script>
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
+    if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/service-worker.js')
-            .then((registration) => {
-                console.log('Service Worker registrado com sucesso:', registration);
-
-                // Removido o trecho que solicita permissão automaticamente
-                // Isso garante que a permissão só será solicitada ao clicar no botão
-            })
-            .catch((error) => {
-                console.error('Falha ao registrar o Service Worker:', error);
-            });
+            .then(reg => console.log('Service Worker registrado:', reg.scope))
+            .catch(err => console.error('Erro ao registrar Service Worker:', err));
     }
 </script>
 <body>
@@ -145,27 +138,15 @@
         <div id="verses"></div>
     </div>
 
-    <!-- Adicione este botão no corpo do HTML -->
-    <button id="enable-notifications" style="display: block; margin: 16px auto; padding: 12px 24px; font-size: 1rem; background-color: var(--gold-primary); color: white; border: none; border-radius: 8px; cursor: pointer;">
-        Ativar Notificações
-    </button>
-
-    <md-dialog id="end-dialog" style="display: flex; justify-content: center; align-items: center; height: 200px;">
-        <h1 id="dialog-message" style="font-size: 2rem; text-align: center;">Carregando...</h1>
+    <md-dialog id="end-dialog" style="display: none; justify-content: center; align-items: center; height: 200px;">
+        <h1 id="dialog-message" style="font-size: 2rem; text-align: center;"></h1>
     </md-dialog>
     
-    <script>
-        setTimeout(function() {
-            document.getElementById('dialog-message').innerText = "Espírito edificado, volte amanhã fortificado!";
-        }, 3000);
-    </script>    
-
     <script>
         async function loadVerses() {
             try {
                 const response = await fetch('nvi.json');
                 const bibleData = await response.json();
-                console.log('Bible Data:', bibleData);
 
                 const bookAbbrev = 'pv';
                 const book = bibleData.find(b => b.abbrev === bookAbbrev);
@@ -207,68 +188,14 @@
             const lastVerse = document.getElementById('last-verse');
             if (lastVerse) {
                 console.log('Último versículo exibido:', lastVerse.textContent);
+                const dialog = document.getElementById('end-dialog');
+                const message = document.getElementById('dialog-message');
+                message.innerText = "Espírito edificado, volte amanhã fortificado!";
+                dialog.style.display = "flex";
             }
         }
 
         window.onload = loadVerses;
-    </script>
-
-    <script>
-        document.getElementById('enable-notifications').addEventListener('click', () => {
-            if ('serviceWorker' in navigator && 'PushManager' in window) {
-                // Solicitar permissão para notificações
-                Notification.requestPermission().then((permission) => {
-                    if (permission === 'granted') {
-                        console.log('Permissão para notificações concedida.');
-
-                        // Registrar o Service Worker
-                        navigator.serviceWorker.register('/service-worker.js')
-                            .then((registration) => {
-                                console.log('Service Worker registrado com sucesso:', registration);
-
-                                // Enviar notificação de confirmação
-                                registration.showNotification('Notificações Ativadas', {
-                                    body: 'Você receberá notificações diárias para ler o capítulo de hoje.',
-                                    icon: 'bible-.png',
-                                    badge: 'bible-.png'
-                                });
-
-                                // Agendar notificações diárias
-                                scheduleDailyNotification();
-                            })
-                            .catch((error) => {
-                                console.error('Falha ao registrar o Service Worker:', error);
-                            });
-                    } else {
-                        console.log('Permissão para notificações negada.');
-                    }
-                });
-            } else {
-                console.error('Service Worker ou PushManager não suportados neste navegador.');
-            }
-        });
-
-        function scheduleDailyNotification() {
-            if ('serviceWorker' in navigator && 'Notification' in window) {
-                navigator.serviceWorker.ready.then((registration) => {
-                    const title = 'Provérbios do Dia';
-                    const options = {
-                        body: 'Leia o capítulo de hoje e edifique seu espírito!',
-                        icon: 'bible-.png',
-                        badge: 'bible-.png'
-                    };
-
-                    // Agendar notificação para o próximo dia
-                    const now = new Date();
-                    const nextDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 8, 0, 0); // 8:00 AM
-                    const delay = nextDay - now;
-
-                    setTimeout(() => {
-                        registration.showNotification(title, options);
-                    }, delay);
-                });
-            }
-        }
     </script>
 </body>
 </html>
