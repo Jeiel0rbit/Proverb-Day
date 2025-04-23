@@ -120,7 +120,73 @@
         }
     
         /* FIM DOS ESTILOS DO DRAWER */
-    
+      
+     /* Caixa do diálogo */
+     #downloadDialogOverlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+    }
+ 
+    #downloadDialog {
+  background: var(--gold-bg);
+  border: 2px solid var(--gold-primary);
+  padding: 1.5rem;
+  border-radius: 12px;
+  max-width: 90%;
+  width: 320px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  text-align: center;
+  font-family: sans-serif;
+  color: var(--gold-deep);
+}
+
+#downloadDialog h2 {
+  margin-top: 0;
+  font-size: 1.3rem;
+  color: var(--gold-dark);
+}
+
+#downloadDialog p {
+  margin: 0.75rem 0;
+  color: var(--gold-deep);
+  font-size: 1rem;
+}
+
+#downloadDialog button {
+  margin: 0.5rem;
+  padding: 0.5rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+/* Botão para baixar o app */
+#downloadBtn {
+  background: var(--gold-primary);
+  color: white;
+}
+#downloadBtn:hover {
+  background: var(--gold-dark);
+}
+
+/* Botão para fechar */
+#closeBtn {
+  background: transparent;
+  color: var(--gold-deep);
+  border: 1px solid var(--gold-pale);
+}
+#closeBtn:hover {
+  background: var(--gold-pale);
+}
+      /* corpo geral */
         body {
             margin: 0;
             padding: 16px;
@@ -223,7 +289,37 @@
     }
 </script>
 <body>
-    
+      <!-- Diálogo de download -->
+  <div id="downloadDialogOverlay">
+    <div id="downloadDialog">
+      <h2>Baixe nosso App!</h2>
+      <p>Quer instalar o Proverbios do Dia para ter inspirações diárias?</p>
+      <button id="downloadBtn">Quero baixar</button>
+      <button id="closeBtn">Agora não</button>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const overlay = document.getElementById('downloadDialogOverlay');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const closeBtn = document.getElementById('closeBtn');
+      const storageKey = 'downloadDialogDismissed';
+
+      if (!localStorage.getItem(storageKey)) {
+        overlay.style.display = 'flex';
+      }
+
+   
+      closeBtn.addEventListener('click', () => {
+        localStorage.setItem(storageKey, 'true');
+        overlay.style.display = 'none';
+      });
+      downloadBtn.addEventListener('click', () => {
+        window.location.href = 'https://jeielmiranda.is-a.dev/ProverbiosdoDia/';
+      });
+    });
+  </script>
+  <!-- FIM Diálogo de download -->
    <!-- Overlay Drawer -->
 <div id="Container">
     <div class="overlay" id="overlay"></div>
