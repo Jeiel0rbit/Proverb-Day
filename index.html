@@ -279,6 +279,34 @@
                 font-size: 1.3rem;
             }
         }
+
+.audio-control {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--gold-primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+    z-index: 1000;
+}
+
+.audio-control:hover {
+    background: var(--gold-dark);
+}
+
+.audio-control[data-playing="true"] {
+    background: var(--gold-dark);
+}
     </style>    
 </head>
 <script>
@@ -362,6 +390,10 @@
         <h1 id="dialog-message" style="font-size: 2rem; text-align: center;"></h1>
     </md-dialog>
     
+    <button class="audio-control" id="audioControl" title="Ouvir capítulo">
+    🔊
+</button>
+
     <script>
 const bibleData = [
     {
@@ -1420,6 +1452,80 @@ function observeLastVerse() {
 }
 
 window.onload = loadVerses;
+
+let speechUtterance = null;
+let isPlaying = false;
+
+function toggleSpeech() {
+    if (!isPlaying) {
+        startSpeech();
+    } else {
+        stopSpeech();
+    }
+}
+
+function startSpeech() {
+    const versesContainer = document.getElementById('verses');
+    const chapterDisplay = document.getElementById('chapter-display');
+    const audioButton = document.getElementById('audioControl');
+    
+    if ('speechSynthesis' in window) {
+        speechUtterance = new SpeechSynthesisUtterance();
+        
+        // Configurar a voz em português
+        const voices = speechSynthesis.getVoices();
+        const portugueseVoice = voices.find(voice => voice.lang.includes('pt'));
+        if (portugueseVoice) {
+            speechUtterance.voice = portugueseVoice;
+        }
+        
+        // Texto a ser lido
+        const textToRead = `${chapterDisplay.textContent}. ${Array.from(versesContainer.children)
+            .map(verse => verse.textContent)
+            .join('. ')}`;
+            
+        speechUtterance.text = textToRead;
+        speechUtterance.lang = 'pt-BR';
+        speechUtterance.rate = 0.9;
+        speechUtterance.pitch = 1;
+        
+        speechUtterance.onend = function() {
+            isPlaying = false;
+            audioButton.textContent = '🔊';
+            audioButton.setAttribute('data-playing', 'false');
+            audioButton.title = 'Ouvir capítulo';
+        };
+        
+        window.speechSynthesis.speak(speechUtterance);
+        isPlaying = true;
+        audioButton.textContent = '⏹️';
+        audioButton.setAttribute('data-playing', 'true');
+        audioButton.title = 'Parar';
+    } else {
+        alert('Desculpe, seu navegador não suporta a função de leitura em voz alta.');
+    }
+}
+
+function stopSpeech() {
+    if (speechUtterance) {
+        window.speechSynthesis.cancel();
+        isPlaying = false;
+        const audioButton = document.getElementById('audioControl');
+        audioButton.textContent = '🔊';
+        audioButton.setAttribute('data-playing', 'false');
+        audioButton.title = 'Ouvir capítulo';
+    }
+}
+
+// Adicione este trecho ao final da função loadVerses()
+document.getElementById('audioControl').addEventListener('click', toggleSpeech);
+
+// Garante que as vozes sejam carregadas
+speechSynthesis.onvoiceschanged = function() {
+    const voices = speechSynthesis.getVoices();
+    console.log('Vozes disponíveis:', voices);
+};
+
     </script>
 </body>
 </html>
