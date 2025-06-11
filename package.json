@@ -1,0 +1,27 @@
+{
+  "name": "proverb-day",
+  "version": "1.0.0",
+  "description": "Um projeto simples com HTML, CSS e JavaScript para exibir um provérbio por dia.",
+  "scripts": {
+    "prepare": "husky"
+  },
+  "keywords": [
+    "html",
+    "css",
+    "javascript",
+    "provérbio",
+    "commitlint"
+  ],
+  "author": "Jeiel Miranda",
+  "license": "MIT",
+  "devDependencies": {
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0",
+    "husky": "^9.0.0"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  }
+}
